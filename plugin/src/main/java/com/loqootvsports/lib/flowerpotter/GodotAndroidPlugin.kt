@@ -44,7 +44,8 @@ class GodotAndroidPlugin(godot: Godot): GodotPlugin(godot) {
         // Execute in a background thread so the game doesn't freeze
         Thread {
             try {
-                YoutubeDL.getInstance().execute(request) { progress, eta ->
+                YoutubeDL.getInstance().execute(request) { progress, eta, line ->
+                    // 'line' is the raw string output from yt-dlp (e.g., "[download] 10% of ...")
                     emitSignal("download_progress", progress, eta)
                 }
                 emitSignal("download_completed", url)
