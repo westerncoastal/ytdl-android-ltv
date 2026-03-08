@@ -1,24 +1,41 @@
-name: Validate FlowerPotter Plugin
-on: [push, pull_request]
+name: Android Plugin Build & Validate
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  validate:
+  build_and_validate:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
 
-      # 1. Check for GDScript Syntax Errors
-      - name: Install GDScript Toolkit
-        run: pip3 install "gdtoolkit==4.*"
-      - name: Lint export_plugin.gd
-        run: gdlint addons/FlowerPotter/export_plugin.gd
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
 
-      # 2. Check for Missing Binaries (Crucial for Android)
-      - name: Verify AAR Files Exist
-        run: |
-          if [ ! -f "addons/FlowerPotter/bin/debug/FlowerPotter-debug.aar" ]; then
-            echo "Error: Debug AAR missing!" && exit 1
-          fi
-          if [ ! -f "addons/FlowerPotter/bin/release/FlowerPotter-release.aar" ]; then
-            echo "Error: Release AAR missing!" && exit 1
-          fi
+    - name: Build with Gradle
+      run: |
+        chmod +x gradlew
+        ./gradlew assemble
+
+    # --- VALIDATION STAGE ---
+    - name: Install GDScript Toolkit
+      run: pip3 install "gdtoolkit==4.*"
+
+    - name: Lint export_plugin.gd
+      # Use the path where Gradle actually puts the file
+      run: gdlint plugin/demo/addons/FlowerPotter/export_plugin.gd
+
+    - name: Verify AAR Binaries
+      run: |
+        if [ ! -f "plugin/demo/addons/FlowerPotter/bin/debug/FlowerPotter-debug.aar" ]; then
+          echo "Error: Debug AAR missing!" && exit 1
+        fi
