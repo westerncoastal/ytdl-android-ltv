@@ -1,0 +1,24 @@
+name: Validate FlowerPotter Plugin
+on: [push, pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. Check for GDScript Syntax Errors
+      - name: Install GDScript Toolkit
+        run: pip3 install "gdtoolkit==4.*"
+      - name: Lint export_plugin.gd
+        run: gdlint addons/FlowerPotter/export_plugin.gd
+
+      # 2. Check for Missing Binaries (Crucial for Android)
+      - name: Verify AAR Files Exist
+        run: |
+          if [ ! -f "addons/FlowerPotter/bin/debug/FlowerPotter-debug.aar" ]; then
+            echo "Error: Debug AAR missing!" && exit 1
+          fi
+          if [ ! -f "addons/FlowerPotter/bin/release/FlowerPotter-release.aar" ]; then
+            echo "Error: Release AAR missing!" && exit 1
+          fi
