@@ -10,7 +10,7 @@ plugins {
 val pluginName = "FlowerPotter"
 
 // TODO: Update value to match your plugin's package name.
-val pluginPackageName = "org.godotengine.plugin.android.template"
+val pluginPackageName = "com.loqootvsports.lib.flowerpotter"
 
 android {
     namespace = pluginPackageName
