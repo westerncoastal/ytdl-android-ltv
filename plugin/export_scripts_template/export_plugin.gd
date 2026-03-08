@@ -33,10 +33,12 @@ class AndroidExportPlugin extends EditorExportPlugin:
 
 	func _get_android_dependencies(platform, debug):
 		# TODO: Add remote dependices here.
-		if debug:
-			return PackedStringArray([])
-		else:
-			return PackedStringArray([])
+		if not _supports(platform):
+        	return PackedStringArray()
+    	return PackedStringArray([
+        	"io.github.junkfood02.youtubedl-android:library:0.18.1",
+        	"io.github.junkfood02.youtubedl-android:ffmpeg:0.18.1"
+    	])
 
 	func _get_name():
 		return _plugin_name
